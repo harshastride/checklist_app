@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stint Interview Ready Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ink:#0F2545; --deep:#4474B9; --mid:#4E8ACE; --cyan:#75C4F3; --coral:#FF6B35;
+  --bg:#F5F8FC; --surface:#FFFFFF; --line:#D9E3F0; --text:#0F2545; --muted:#5B6B85;
+  --pass:#1F9D6A; --pass-bg:#E4F6EE; --warn:#C98A00; --warn-bg:#FFF4D6; --fail:#D64545; --fail-bg:#FDE8E8;
+  --idle-bg:#EEF3FA; --shadow:0 6px 24px rgba(15,37,69,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0B1730; --surface:#132345; --line:#243b66; --text:#EAF1FB; --muted:#9FB2CF; --ink:#EAF1FB;
+    --pass-bg:#123d2e; --warn-bg:#3d2f0a; --fail-bg:#45191a; --idle-bg:#1a2c52; --shadow:0 6px 24px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:Poppins,"Segoe UI",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 60px;padding-inline:16px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.01em}
+.logo svg{width:30px;height:30px}
+.logo small{display:block;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.2;margin:0 0 6px;text-wrap:balance;font-weight:700}
+.lead{color:var(--muted);margin:0 0 18px;max-width:60ch}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:22px}
+.ring{position:relative;width:92px;height:92px}
+.ring svg{width:92px;height:92px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .track{stroke:var(--idle-bg)}
+.ring .bar{stroke:var(--deep);stroke-linecap:round;stroke-dasharray:251;stroke-dashoffset:251;transition:stroke-dashoffset .6s ease, stroke .3s}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.ring .num span{font-size:11px;color:var(--muted);font-weight:500;margin-top:-4px}
+.summary h2{margin:0 0 4px;font-size:18px}
+.summary p{margin:0;color:var(--muted);font-size:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{font-family:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:10px 18px;cursor:pointer;background:var(--deep);color:#fff;transition:transform .08s,background .2s}
+button:hover{background:var(--mid)}
+button:active{transform:scale(.97)}
+button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+button.ghost{background:transparent;color:var(--deep);border:1.5px solid var(--deep)}
+button.ghost:hover{background:var(--idle-bg)}
+button.coral{background:var(--coral)}
+button.coral:hover{background:#ff7f4f}
+button:disabled{opacity:.55;cursor:not-allowed}
+.checks{display:grid;gap:14px}
+.check{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;border-left:5px solid var(--line);transition:border-color .3s}
+.check[data-state="pass"]{border-left-color:var(--pass)}
+.check[data-state="warn"]{border-left-color:var(--warn)}
+.check[data-state="fail"]{border-left-color:var(--fail)}
+.check[data-state="running"]{border-left-color:var(--coral)}
+.icon{width:44px;height:44px;border-radius:12px;background:var(--idle-bg);display:grid;place-items:center;color:var(--deep)}
+.icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.check h3{margin:0;font-size:16px;font-weight:600}
+.check .why{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--idle-bg);color:var(--muted);white-space:nowrap;letter-spacing:.02em}
+.check[data-state="pass"] .pill{background:var(--pass-bg);color:var(--pass)}
+.check[data-state="warn"] .pill{background:var(--warn-bg);color:var(--warn)}
+.check[data-state="fail"] .pill{background:var(--fail-bg);color:var(--fail)}
+.check[data-state="running"] .pill{background:#ffe6db;color:#c24e1e}
+.body{grid-column:2/4;display:grid;gap:10px}
+.result{font-size:14px;margin:0}
+.result b{font-weight:600}
+.metrics{display:flex;flex-wrap:wrap;gap:8px}
+.metric{background:var(--idle-bg);border-radius:10px;padding:6px 10px;font-size:13px;font-variant-numeric:tabular-nums}
+.metric small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tip{font-size:13px;padding:10px 12px;border-radius:10px;background:var(--warn-bg);color:var(--text);margin:0}
+.check[data-state="fail"] .tip{background:var(--fail-bg)}
+.check[data-state="pass"] .tip{background:var(--pass-bg)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.meter{height:14px;border-radius:7px;background:var(--idle-bg);overflow:hidden;flex:1;min-width:140px}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mid),var(--pass));transition:width .08s}
+.bar-h{height:8px;border-radius:4px;background:var(--idle-bg);overflow:hidden}
+.bar-h i{display:block;height:100%;width:0;background:var(--deep);transition:width .3s}
+video{width:100%;max-width:360px;aspect-ratio:4/3;border-radius:12px;background:#000;object-fit:cover;transform:scaleX(-1)}
+.camwrap{position:relative;width:100%;max-width:360px}
+.guide{position:absolute;inset:0;pointer-events:none}
+.guide svg{width:100%;height:100%}
+.hidden{display:none}
+#ai-box{display:grid;gap:10px;background:var(--idle-bg);border-radius:12px;padding:12px}
+.ai-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ai-badge{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--bg);padding:3px 8px;border-radius:6px}
+.ai-status{font-size:13px;color:var(--muted)}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ai-item{background:var(--surface);border-radius:10px;padding:8px 10px;font-size:13px;border-left:4px solid var(--muted)}
+.ai-item.pass{border-left-color:var(--pass)}.ai-item.warn{border-left-color:var(--warn)}.ai-item.fail{border-left-color:var(--fail)}
+.ai-item small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ai-feedback{margin:0;padding-left:18px;font-size:14px;display:grid;gap:4px}
+.ai-feedback:empty{display:none}
+#ai-snap{width:120px;border-radius:8px;transform:scaleX(-1)}
+.report{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.report h2{margin:0 0 10px;font-size:18px}
+.report table{width:100%;border-collapse:collapse;font-size:14px}
+.report td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.report td:first-child{font-weight:600;width:24%}
+.report td:last-child{text-align:right;width:26%}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;background:var(--muted)}
+.dot.pass{background:var(--pass)}.dot.warn{background:var(--warn)}.dot.fail{background:var(--fail)}
+textarea{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:12px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--text);min-height:150px;resize:vertical}
+.note{font-size:12px;color:var(--muted);margin-top:14px}
+input[type=text]{font-family:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);min-width:200px;flex:1}
+@media (max-width:480px){.summary{grid-template-columns:1fr}.check{grid-template-columns:40px 1fr}.check .pill{grid-column:2;justify-self:start}.body{grid-column:1/3}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 30 16 16 30 2 16Z" fill="#4474B9"/><path d="M16 9 23 16 16 23 9 16Z" fill="#75C4F3"/></svg>
+    <div>Stint Academy<small>Interview Ready Check</small></div>
+  </div>
+</header>
+
+<h1>Is your setup ready for the interview?</h1>
+<p class="lead">Five quick steps, about two minutes. Allow mic and camera when your browser asks. Do this on the same laptop, room and internet you will use for the interview.</p>
+
+<div class="summary">
+  <div class="ring">
+    <svg viewBox="0 0 92 92"><circle class="track" cx="46" cy="46" r="40"/><circle class="bar" id="ringBar" cx="46" cy="46" r="40"/></svg>
+    <div class="num"><div id="ringNum">0<span>of 6 done</span></div></div>
+  </div>
+  <div>
+    <h2 id="sumTitle">Not started yet</h2>
+    <p id="sumText">Press Start and follow each step. Green means ready, amber means fix if you can, red means fix before the interview.</p>
+    <div class="actions">
+      <button id="startAll" class="coral">Start all checks</button>
+      <button id="resetAll" class="ghost">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="checks">
+
+<section class="check" id="c-net" data-state="idle">
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1"/></svg></div>
+  <div><h3>Internet speed</h3><p class="why">Minimum 100 Mbps download. Tested with the Cloudflare speed test engine.</p></div>
+  <span class="pill">Not run</span>
+  <div class="body">
+    <p class="result" id="net-result">Measures download, upload, ping and jitter — takes about 15 seconds.</p>
+    <div class="bar-h" id="net-prog"><i></i></div>
+    <div class="metrics" id="net-metrics"></div>
+    <p class="tip hidden" id="net-tip"></p>
+    <div class="row"><button data-run="net">Test speed</button></div>
+  </div>
+</section>
+
+<section class="check" id="c-cpu" data-state="idle">
+  <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20M8 12l2-3 2 4 2-5 2 4"/></svg></div>
+  <div><h3>Laptop performance</h3><p class="why">A slow or overheating laptop freezes video.</p></div>
+  <span class="pill">Not run</span>
+  <div class="body">
+    <p class="result" id="cpu-result">Checks processor, memory, battery and how smoothly the browser runs.</p>
+    <div class="metrics" id="cpu-metrics"></div>
+    <p class="tip hidden" id="cpu-tip"></p>
+    <div class="row"><button data-run="cpu">Test laptop</button></div>
+  </div>
+</section>
+
+<section class="check" id="c-mic" data-state="idle">
+  <div class="icon"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg></div>
+  <div><h3>Microphone</h3><p class="why">The interviewer must hear you clearly, without noise.</p></div>
+  <span class="pill">Not run</span>
+  <div class="body">
+    <p class="result" id="mic-result">You will read one line aloud for 5 seconds while we measure your voice level and background noise.</p>
+    <div class="row"><div class="meter"><i id="mic-level"></i></div><span id="mic-count" style="min-width:34px;font-variant-numeric:tabular-nums"></span></div>
+    <p class="tip hidden" id="mic-tip"></p>
+    <div class="metrics" id="mic-metrics"></div>
+    <div class="row"><button data-run="mic">Test mic</button><button class="ghost hidden" id="mic-play">Play my recording</button></div>
+  </div>
+</section>
+
+<section class="check" id="c-spk" data-state="idle">
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4ZM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></div>
+  <div><h3>Speaker / headphones</h3><p class="why">You need to hear every question the first time.</p></div>
+  <span class="pill">Not run</span>
+  <div class="body">
+    <p class="result" id="spk-result">We play a short chime at normal volume. Tell us if you heard it.</p>
+    <p class="tip hidden" id="spk-tip"></p>
+    <div class="row"><button data-run="spk">Play sound</button><button class="ghost hidden" id="spk-yes">I heard it</button><button class="ghost hidden" id="spk-no">I did not hear it</button></div>
+  </div>
+</section>
+
+<section class="check" id="c-cam" data-state="idle">
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
+  <div><h3>Camera review: lighting, dressing &amp; background</h3><p class="why">AI looks at one photo and tells you exactly what to fix.</p></div>
+  <span class="pill">Not run</span>
+  <div class="body">
+    <p class="result" id="cam-result">Fit your head inside the dotted oval, sit as you will in the interview, then press <b>Take photo &amp; review</b>.</p>
+    <div class="camwrap hidden" id="cam-wrap"><video id="cam" autoplay playsinline muted></video>
+      <div class="guide"><svg viewBox="0 0 400 300"><ellipse cx="200" cy="120" rx="62" ry="80" fill="none" stroke="#75C4F3" stroke-width="3" stroke-dasharray="8 6"/><path d="M80 300c10-70 60-95 120-95s110 25 120 95" fill="none" stroke="#75C4F3" stroke-width="3" stroke-dasharray="8 6"/></svg></div>
+    </div>
+    <div id="ai-box" class="hidden">
+      <div class="ai-head"><span class="ai-badge">AI review</span><span id="ai-status" class="ai-status"></span></div>
+      <div class="ai-grid" id="ai-grid"></div>
+      <ul class="ai-feedback" id="ai-feedback"></ul>
+      <img id="ai-snap" alt="Captured frame" class="hidden">
+    </div>
+    <p class="tip hidden" id="cam-tip"></p>
+    <div class="row"><button data-run="cam">Open camera</button><button class="coral hidden" id="cam-shoot">Take photo &amp; review</button></div>
+  </div>
+</section>
+
+</div>
+
+<div class="report" id="report">
+  <h2>Result card</h2>
+  <div class="row" style="margin-bottom:12px"><input type="text" id="cname" placeholder="Your name (for the report)"></div>
+  <table id="rtable"></table>
+  <div class="actions">
+    <button id="copyBtn">Copy result</button>
+    <a id="waLink" href="#" target="_blank" rel="noopener"><button class="ghost" type="button">Send on WhatsApp</button></a>
+  </div>
+  <textarea id="rtext" readonly style="margin-top:12px" aria-label="Result text"></textarea>
+  <p class="note">Your photo is sent once to the AI for review and is not stored. The speed test measures download only. Use Chrome or Edge and allow camera and mic permissions.</p>
+</div>
+</div>
+
+<script type="module">
+import SpeedTest from './vendor/speedtest.js';
+(function(){
+const $=s=>document.querySelector(s);
+const S={net:null,cpu:null,mic:null,spk:null,light:null,dress:null};
+const NAMES={net:'Internet',cpu:'Laptop',mic:'Microphone',spk:'Speaker',light:'Lighting',dress:'Dressing & background'};
+const LBL={idle:'Not run',running:'Testing…',pass:'Ready',warn:'Fix if possible',fail:'Fix before interview',pending:'Your answer'};
+let stream=null;
+
+function setState(k,state,summary,tip){
+  const card=k==='light'||k==='dress'?'cam':k;
+  const el=$('#c-'+card); el.dataset.state=state; el.querySelector('.pill').textContent=LBL[state]||state;
+  if(summary!==undefined)$('#'+card+'-result').innerHTML=summary;
+  const t=$('#'+card+'-tip'); if(tip){t.textContent=tip;t.classList.remove('hidden');}else t.classList.add('hidden');
+  if(['pass','warn','fail'].includes(state))S[k]={state,summary:(summary||'').replace(/<[^>]+>/g,''),tip:tip||''}; else if(state==='idle')S[k]=null;
+  refresh();
+}
+function metrics(k,list){$('#'+k+'-metrics').innerHTML=list.map(([l,v])=>`<div class="metric"><small>${l}</small>${v}</div>`).join('');}
+
+function refresh(){
+  const done=Object.values(S).filter(Boolean); const n=done.length;
+  $('#ringNum').firstChild.nodeValue=n; $('#ringBar').style.strokeDashoffset=251-251*n/6;
+  const fails=done.filter(d=>d.state==='fail').length, warns=done.filter(d=>d.state==='warn').length;
+  $('#ringBar').style.stroke=fails?'var(--fail)':warns?'var(--warn)':n===6?'var(--pass)':'var(--deep)';
+  if(n===0){$('#sumTitle').textContent='Not started yet';}
+  else if(n<6){$('#sumTitle').textContent=`${n} of 6 checks done`; $('#sumText').textContent=fails?`${fails} check${fails>1?'s':''} need fixing so far.`:'Keep going.';}
+  else if(fails){$('#sumTitle').textContent='Not ready yet'; $('#sumText').textContent=`Fix the ${fails} red item${fails>1?'s':''} below, then run again.`;}
+  else if(warns){$('#sumTitle').textContent='Almost ready'; $('#sumText').textContent=`All good, ${warns} amber item${warns>1?'s':''} worth improving.`;}
+  else{$('#sumTitle').textContent='You are interview-ready'; $('#sumText').textContent='Everything passed. Send the result card to your placement coordinator.';}
+  buildReport();
+}
+function buildReport(){
+  const rows=Object.keys(S).map(k=>{const d=S[k];return `<tr><td>${NAMES[k]}</td><td>${d?d.summary:'<span style="color:var(--muted)">Not run</span>'}${d&&d.tip?`<br><small style="color:var(--muted)">${d.tip}</small>`:''}</td><td><span class="dot ${d?d.state:''}"></span>${d?LBL[d.state]:'—'}</td></tr>`;});
+  $('#rtable').innerHTML=rows.join('');
+  const name=$('#cname').value.trim();
+  const lines=[`Interview Ready Check${name?' – '+name:''}`,new Date().toLocaleString('en-IN'),'',...Object.keys(S).map(k=>{const d=S[k];const ic=d?({pass:'✅',warn:'🟡',fail:'❌'})[d.state]:'⬜';return `${ic} ${NAMES[k]}: ${d?d.summary:'not run'}`;}),'',$('#sumTitle').textContent];
+  const txt=lines.join('\n'); $('#rtext').value=txt; $('#waLink').href='https://wa.me/?text='+encodeURIComponent(txt);
+}
+$('#cname').addEventListener('input',buildReport);
+$('#copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText($('#rtext').value);}catch(e){$('#rtext').select();document.execCommand('copy');}$('#copyBtn').textContent='Copied';setTimeout(()=>$('#copyBtn').textContent='Copy result',1500);};
+
+/* ---------- 1. NETWORK (Cloudflare Speedtest engine, same as speed.cloudflare.com) ---------- */
+const MIN_DOWN=100;   // Mbps download required to pass
+const MIN_UP=10;      // Mbps upload (amber if below)
+const MAX_PING=100;   // ms (amber if above)
+const NET_PHASES=[    // ~15 s: ping, then download and upload at growing sizes
+  {type:'latency',numPackets:20},
+  {type:'download',bytes:1e5,count:1,bypassMinDuration:true},
+  {type:'download',bytes:1e6,count:8},
+  {type:'download',bytes:1e7,count:6},
+  {type:'download',bytes:2.5e7,count:4},
+  {type:'upload',bytes:1e5,count:8},
+  {type:'upload',bytes:1e6,count:6},
+  {type:'upload',bytes:1e7,count:4},
+  {type:'latency',numPackets:10}
+];
+let netEngine=null;
+function runNet(){
+  return new Promise(resolve=>{
+    setState('net','running','Testing against Cloudflare… about 15 seconds. Keep this tab open.'); const prog=$('#net-prog i'); prog.style.width='5%'; metrics('net',[]);
+    const mb=v=>v==null?null:v/1e6;
+    const show=s=>metrics('net',[['Download',s.download!=null?mb(s.download).toFixed(1)+' Mbps':'…'],['Upload',s.upload!=null?mb(s.upload).toFixed(1)+' Mbps':'…'],['Ping',s.latency!=null?Math.round(s.latency)+' ms':'…'],['Jitter',s.jitter!=null?Math.round(s.jitter)+' ms':'…']]);
+    let done=false; const finish=fn=>{if(done)return;done=true;try{netEngine&&netEngine.pause();}catch(e){}netEngine=null;fn();resolve();};
+    const timer=setTimeout(()=>finish(()=>setState('net','fail','Speed test could not finish.','Your connection is very slow or unstable. Switch to a better network and test again.')),60000);
+    try{
+      if(netEngine){try{netEngine.pause();}catch(e){}}
+      netEngine=new SpeedTest({autoStart:false,measurements:NET_PHASES,logAimApiUrl:null});
+      const phases=NET_PHASES.length; let idx=0;
+      netEngine.onPhaseChange=()=>{idx++;prog.style.width=Math.min(95,Math.round(idx/phases*100))+'%';};
+      netEngine.onResultsChange=()=>{try{show(netEngine.results.getSummary());}catch(e){}};
+      netEngine.onError=(msg)=>{clearTimeout(timer);finish(()=>setState('net','fail','Speed test failed: '+msg,'Check the connection and press Test speed again.'));};
+      netEngine.onFinish=results=>{
+        clearTimeout(timer);
+        const s=results.getSummary(); const down=mb(s.download)||0, up=mb(s.upload)||0, ping=Math.round(s.latency||0), jit=Math.round(s.jitter||0);
+        show(s); prog.style.width='100%';
+        const line=`<b>${down.toFixed(0)} Mbps</b> down, ${up.toFixed(0)} Mbps up, ${ping} ms ping.`;
+        finish(()=>{
+          if(down<MIN_DOWN)setState('net','fail',line+` Below the ${MIN_DOWN} Mbps minimum.`,'Plug in a LAN cable or move next to the router. If it is still below the limit, use a faster plan or a 5G hotspot, then test again.');
+          else if(up<MIN_UP||ping>MAX_PING||jit>30)setState('net','warn',line+' Download is fine, but '+(up<MIN_UP?'upload is weak':ping>MAX_PING?'ping is high':'connection is jittery')+'.','Ask others at home to pause videos and downloads during the interview, and prefer a LAN cable over Wi-Fi.');
+          else setState('net','pass',line+' Excellent for HD video.');
+        });
+      };
+      netEngine.play();
+    }catch(e){clearTimeout(timer);finish(()=>setState('net','fail','Speed test could not start.','Reload the page and try again.'));}
+  });
+}
+
+/* ---------- 2. LAPTOP ---------- */
+async function runCpu(){
+  setState('cpu','running','Measuring… this takes about 3 seconds.');
+  const cores=navigator.hardwareConcurrency||0, mem=navigator.deviceMemory||0;
+  const t0=performance.now(); let x=0; for(let i=0;i<8e6;i++){x+=Math.sqrt(i)*Math.sin(i);} const cpuMs=performance.now()-t0;
+  const fps=await new Promise(res=>{let f=0;const s=performance.now();function tick(){f++;if(performance.now()-s<1000)requestAnimationFrame(tick);else res(Math.round(f/((performance.now()-s)/1000)));}requestAnimationFrame(tick);});
+  let bat=null; try{if(navigator.getBattery){const b=await navigator.getBattery();bat={lvl:Math.round(b.level*100),chg:b.charging};}}catch(e){}
+  const ua=navigator.userAgent; const browser=/Edg\//.test(ua)?'Edge':/Chrome\//.test(ua)?'Chrome':/Firefox\//.test(ua)?'Firefox':/Safari\//.test(ua)?'Safari':'Other';
+  const os=/Mac/.test(ua)?'macOS':/Windows/.test(ua)?'Windows':/Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':/Linux/.test(ua)?'Linux':'Unknown';
+  const mobile=/Android|iPhone|iPad/.test(ua);
+  metrics('cpu',[['CPU cores',cores||'?'],['Memory',mem?mem+' GB+':'?'],['Speed score',cpuMs<400?'Fast':cpuMs<900?'OK':'Slow'],['Smoothness',fps+' fps'],...(bat?[['Battery',bat.lvl+'% '+(bat.chg?'charging':'not charging')]]:[]),['Device',os+' · '+browser+' · '+screen.width+'×'+screen.height]]);
+  const tips=[]; let st='pass';
+  if(mobile){st='warn';tips.push('You are on a phone. Use a laptop for the interview if at all possible.');}
+  if(cpuMs>=900||fps<24){st='fail';tips.push('Laptop is running slow. Close every other app and browser tab, and restart the laptop 15 minutes before the interview.');}
+  else if(cpuMs>=400||fps<50||(cores&&cores<4)||(mem&&mem<4)){if(st!=='fail')st='warn';tips.push('Close heavy apps (Teams, VS Code, extra tabs) during the interview.');}
+  if(bat&&!bat.chg&&bat.lvl<50){if(st!=='fail')st='warn';tips.push('Plug in the charger. Battery at '+bat.lvl+'%.');}
+  if(browser==='Other'||browser==='Safari'){if(st!=='fail')st='warn';tips.push('Use Chrome or Edge for interviews; they work best with Teams, Meet and Zoom in the browser.');}
+  setState('cpu',st,`${cores||'?'} cores, ${mem?mem+' GB+ RAM, ':''}${cpuMs<400?'fast':cpuMs<900?'average':'slow'} processor, ${fps} fps display.`,tips.join(' '));
+}
+
+/* ---------- 3. MIC ---------- */
+let micBlob=null;
+async function runMic(){
+  setState('mic','running','Read aloud now: <b>“Hello, my name is ____ and I am excited about this role.”</b>');
+  $('#mic-play').classList.add('hidden'); metrics('mic',[]);
+  let ms;
+  try{ms=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false}});}
+  catch(e){setState('mic','fail','Microphone permission was blocked.','Click the lock icon in the address bar, allow Microphone, then test again.');return;}
+  const ac=new (window.AudioContext||window.webkitAudioContext)(); const src=ac.createMediaStreamSource(ms); const an=ac.createAnalyser(); an.fftSize=2048; src.connect(an);
+  const buf=new Float32Array(an.fftSize); const samples=[]; const lvl=$('#mic-level'); const cnt=$('#mic-count');
+  let rec=null,chunks=[]; try{rec=new MediaRecorder(ms);rec.ondataavailable=e=>chunks.push(e.data);rec.start();}catch(e){}
+  const start=performance.now(); const DUR=5000;
+  await new Promise(res=>{function tick(){an.getFloatTimeDomainData(buf);let s=0;for(let i=0;i<buf.length;i++)s+=buf[i]*buf[i];const rms=Math.sqrt(s/buf.length);samples.push(rms);lvl.style.width=Math.min(100,rms*400)+'%';const left=Math.max(0,DUR-(performance.now()-start));cnt.textContent=(left/1000).toFixed(1)+'s';if(left>0)requestAnimationFrame(tick);else res();}tick();});
+  if(rec){await new Promise(r=>{rec.onstop=r;rec.stop();}); micBlob=new Blob(chunks,{type:rec.mimeType});}
+  ms.getTracks().forEach(t=>t.stop()); ac.close(); lvl.style.width='0'; cnt.textContent='';
+  const sorted=[...samples].sort((a,b)=>a-b); const noise=sorted[Math.floor(sorted.length*0.1)]||0; const peak=sorted[Math.floor(sorted.length*0.95)]||0;
+  const toDb=v=>v>0?Math.round(20*Math.log10(v)):-100; const speaking=samples.filter(v=>v>0.02).length/samples.length;
+  const dev=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput'); const devName=(dev.find(d=>d.deviceId==='default')||dev[0]||{}).label||'Microphone';
+  const snr=toDb(peak)-toDb(noise);
+  metrics('mic',[['Voice level',toDb(peak)+' dB'],['Background noise',toDb(noise)+' dB'],['Clarity (voice vs noise)',snr+' dB'],['Device',devName.replace(/\(.*?\)/g,'').trim().slice(0,28)]]);
+  if(micBlob&&micBlob.size>0)$('#mic-play').classList.remove('hidden');
+  if(peak<0.01)setState('mic','fail','No voice detected.','Check the mic is not muted (keyboard mute key or the OS sound settings) and that the right mic is selected. Then test again.');
+  else if(snr>=20&&noise<0.02&&speaking>0.3)setState('mic','pass',`Clear voice, low background noise (clarity ${snr} dB).`);
+  else if(snr>=12)setState('mic','warn',`Voice is audible but background noise is noticeable (clarity ${snr} dB).`,'Close the door and windows, switch off the fan if you can, and use earphones with a mic. Speak a little louder and closer.');
+  else setState('mic','fail',`Voice is hard to separate from noise (clarity ${snr} dB).`,'Use earphones or a headset with a mic, and move to a quiet room. Test again.');
+}
+$('#mic-play').onclick=()=>{if(!micBlob)return;new Audio(URL.createObjectURL(micBlob)).play();};
+
+/* ---------- 4. SPEAKER ---------- */
+async function runSpk(){
+  setState('spk','running','Playing a chime…');
+  try{const ac=new (window.AudioContext||window.webkitAudioContext)();const now=ac.currentTime;[523.25,659.25,783.99].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,now+i*.25);g.gain.linearRampToValueAtTime(.35,now+i*.25+.03);g.gain.exponentialRampToValueAtTime(.001,now+i*.25+.6);o.connect(g).connect(ac.destination);o.start(now+i*.25);o.stop(now+i*.25+.7);});}catch(e){}
+  setState('spk','pending','Did you hear three rising notes?'); $('#spk-yes').classList.remove('hidden'); $('#spk-no').classList.remove('hidden');
+}
+$('#spk-yes').onclick=()=>{$('#spk-yes').classList.add('hidden');$('#spk-no').classList.add('hidden');setState('spk','pass','Sound is working at a comfortable volume.');};
+$('#spk-no').onclick=()=>{$('#spk-yes').classList.add('hidden');$('#spk-no').classList.add('hidden');setState('spk','fail','No sound heard.','Raise the volume, check the output device in sound settings (speakers vs Bluetooth), unplug and replug earphones, then play again.');};
+
+/* ---------- 5. CAMERA + AI REVIEW ---------- */
+const PASS_SCORE=7;   // 7/10 (70%) or more = Ready, unless something is rated red
+const WARN_SCORE=5;   // 5–6.9 = amber, below 5 = red
+async function runCam(){
+  const v=$('#cam'); $('#cam-wrap').classList.remove('hidden');
+  try{ if(!stream||!stream.active) stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:false}); v.srcObject=stream; await v.play(); }
+  catch(e){$('#cam-wrap').classList.add('hidden');setState('light','fail','Camera permission was blocked.','Click the lock icon in the address bar, allow Camera, then test again.');setState('dress','fail','Camera permission was blocked.');return;}
+  $('#cam-shoot').classList.remove('hidden');
+  $('#c-cam').dataset.state='pending'; $('#c-cam .pill').textContent='Take the photo';
+}
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
+function captureFrame(){const v=$('#cam');const c=document.createElement('canvas');c.width=640;c.height=480;c.getContext('2d').drawImage(v,0,0,640,480);return c.toDataURL('image/jpeg',0.85);}
+
+$('#cam-shoot').onclick=async()=>{
+  const btn=$('#cam-shoot'), status=$('#ai-status'); const v=$('#cam');
+  if(!v.srcObject||v.readyState<2){await runCam(); if(!v.srcObject)return;}
+  $('#ai-box').classList.remove('hidden'); $('#ai-grid').innerHTML=''; $('#ai-feedback').innerHTML='';
+  btn.disabled=true; status.textContent='Hold still… taking the photo.'; await new Promise(r=>setTimeout(r,800));
+  const dataUrl=captureFrame(); $('#ai-snap').src=dataUrl; $('#ai-snap').classList.remove('hidden');
+  status.textContent='AI is looking at your photo… (about 5–10 seconds)';
+  setState('light','running');
+  try{
+    const res=await fetch('/api/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataUrl})});
+    const r=await res.json(); if(!res.ok)throw new Error(r.error||'Review failed');
+    const areas=r.areas||{}; const order=['lighting','attire','grooming','background','framing','posture'];
+    $('#ai-grid').innerHTML=order.filter(k=>areas[k]).map(k=>`<div class="ai-item ${areas[k].rating||''}"><small>${k}</small>${areas[k].note||areas[k].rating||''}</div>`).join('');
+    $('#ai-feedback').innerHTML=(r.feedback||[]).slice(0,3).map(f=>`<li>${String(f)}</li>`).join('');
+    status.textContent=`Score ${r.score??'–'}/10`;
+    const rate=k=>(areas[k]&&['pass','warn','fail'].includes(areas[k].rating))?areas[k].rating:'warn';
+    // Pass rule: score of PASS_SCORE or more and nothing rated red = Ready. Amber items become suggestions only.
+    const score=Number(r.score); const okScore=!isNaN(score)&&score>=PASS_SCORE; const nearScore=!isNaN(score)&&score>=WARN_SCORE;
+    const verdict=ks=>ks.map(rate).includes('fail')?'fail':okScore?'pass':nearScore?'warn':'fail';
+    // Lighting row
+    const lr=verdict(['lighting']); S.light={state:lr,summary:(areas.lighting&&areas.lighting.note)||'Lighting '+lr+'.',tip:''};
+    // Dressing row = attire + grooming + background + framing + posture
+    const dk=['attire','grooming','background','framing','posture']; const ds=verdict(dk);
+    const red=dk.filter(k=>rate(k)==='fail'), amber=dk.filter(k=>rate(k)==='warn');
+    S.dress={state:ds,summary:`AI score ${isNaN(score)?'–':score}/10${red.length?' — must fix: '+red.join(', '):amber.length?' — could improve: '+amber.join(', '):' — looks professional'}.`,tip:(r.feedback||[]).slice(0,2).join(' ')};
+    const cardState=verdict(['lighting',...dk]);
+    refresh();
+    $('#c-cam').dataset.state=cardState; $('#c-cam .pill').textContent=LBL[cardState];
+    const allRed=[...red,...(rate('lighting')==='fail'?['lighting']:[])];
+    $('#cam-result').innerHTML=`<b>Score ${isNaN(score)?'–':score}/10.</b> ${cardState==='pass'?'You are good to go.'+(amber.length?' The amber points are optional improvements.':''):cardState==='warn'?`Score needs to be ${PASS_SCORE} or more. Fix the amber points and review again.`:allRed.length?'Fix the red items ('+allRed.join(', ')+'), then review again.':'Fix the points below and review again.'}`;
+    const tip=$('#cam-tip'); const ft=(r.feedback||[]).slice(0,3).join(' '); if(ft){tip.textContent=ft;tip.classList.remove('hidden');}else tip.classList.add('hidden');
+    btn.textContent='Review again';
+  }catch(e){
+    status.textContent='AI review failed: '+e.message+'. Try again.';
+    $('#c-cam').dataset.state='pending'; $('#c-cam .pill').textContent='Try again';
+  }
+  btn.disabled=false;
+};
+
+/* ---------- wiring ---------- */
+const RUN={net:runNet,cpu:runCpu,mic:runMic,spk:runSpk,cam:runCam};
+document.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>RUN[b.dataset.run]());
+$('#startAll').onclick=async()=>{ $('#startAll').disabled=true;
+  for(const k of ['net','cpu','mic','spk','cam']){ $('#c-'+k).scrollIntoView({behavior:'smooth',block:'center'}); await RUN[k]();
+    if(k==='spk')await new Promise(r=>{const i=setInterval(()=>{if(S.spk){clearInterval(i);r();}},300);}); }
+  $('#startAll').disabled=false; $('#startAll').textContent='Run again';
+};
+$('#resetAll').onclick=()=>{stopCam();for(const k in S){setState(k,'idle');} ['net','cpu','mic'].forEach(k=>metrics(k,[])); $('#cam-wrap').classList.add('hidden'); $('#ai-box').classList.add('hidden'); $('#cam-shoot').classList.add('hidden'); $('#cam-shoot').textContent='Take photo & review'; $('#cam-result').innerHTML='Fit your head inside the dotted oval, sit as you will in the interview, then press <b>Take photo &amp; review</b>.'; $('#startAll').textContent='Start all checks'; window.scrollTo({top:0,behavior:'smooth'});};
+window.addEventListener('pagehide',stopCam);
+refresh();
+})();
+</script>
+</body>
+</html>
